@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 import logging
 import string
@@ -42,7 +43,8 @@ class AccountInvoice(models.Model):
     @api.multi
     def action_invoice_open(self):
         res = super(AccountInvoice, self).action_invoice_open()
-        self.generate_file()
+        if self.type in ('out_invoice', 'out_refund'):
+            self.generate_file()
         return res
 
     @api.multi
