@@ -516,7 +516,7 @@ class AccountInvoice(models.Model):
 
             # Recipient's phone number (20 digits no dashes or spaces).
             txt += pipe
-            txt += self._get_string(self._get_doc_type(id, True).phone)
+            txt += self._get_string(self._get_doc_type(id, True).phone).replace('-','').replace(' ','').replace('+','')
 
             # trade name of the issuer
             txt += pipe
@@ -988,7 +988,7 @@ class AccountInvoice(models.Model):
                '<procesarTextoPlanoSinCtl xmlns="http://www.ekomercio.com/">' + \
                '<usuario>'+ id.company_id.username +'</usuario>' + \
                '<password>'+ id.company_id.password +'</password>' + \
-               '<id>'+id.company_id.company_registry+'</id>' + \
+               '<id>'+str(id.company_id.company_registry).replace('-','').replace(' ','')+'</id>' + \
                '<textoPlano>' + str(txt) + '</textoPlano>' + \
                '</procesarTextoPlanoSinCtl>' + \
                '</soap12:Body>' + \
@@ -1045,13 +1045,13 @@ class AccountInvoice(models.Model):
 
     def _get_phone(self, id):
         if id.phone:
-            return str(id.phone)
+            return str(id.phone).replace('-','').replace(' ','').replace('+','')
         return ''
 
 
     def _get_fax(self, id):
         if id.fax_no:
-            return str(id.fax_no)
+            return str(id.fax_no).replace('-','').replace(' ','').replace('+','')
         return ''
 
 
@@ -1096,7 +1096,7 @@ class AccountInvoice(models.Model):
     def _get_vat_no(self, id):
         if self._get_doc_type(id).vat and len(self._get_doc_type(id).vat) <= 12 and len(self._get_doc_type(id).vat) > 0 and self._no_special(
                 self._get_doc_type(id).vat):
-            return self._get_doc_type(id).vat
+            return str(self._get_doc_type(id).vat).replace('-','').replace(' ','')
         else:
             raise UserError('Required data is missing or empty')
 
@@ -1106,7 +1106,7 @@ class AccountInvoice(models.Model):
                 self._get_doc_type(id).company_registry) <= 12 and len(
             self._get_doc_type(id).company_registry) > 0 and self._no_special(
             self._get_doc_type(id).company_registry):
-            return self._get_doc_type(id).company_registry
+            return str(self._get_doc_type(id).company_registry).replace('-','').replace(' ','')
         else:
             raise UserError('Required data is missing or empty')
 
