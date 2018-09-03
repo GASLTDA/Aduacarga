@@ -40,7 +40,7 @@ from . import res_config_settings
 from . import res_partner
 from . import invoice
 from . import sale_order
-from . import purchase_order
+# from . import purchase_order
 from . import rfq
-from . import delivery_note
-from . import picking
+# from . import delivery_note
+# from . import picking
