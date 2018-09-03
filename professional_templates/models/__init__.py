@@ -41,6 +41,6 @@ from . import res_partner
 from . import invoice
 from . import sale_order
 # from . import purchase_order
-from . import rfq
+# from . import rfq
 # from . import delivery_note
 # from . import picking
