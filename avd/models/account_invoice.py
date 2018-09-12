@@ -51,7 +51,7 @@ class AccountInvoice(models.Model):
     def generate_file(self):
 
         if not self.company_id.url or not self.company_id.username or not self.company_id.password:
-            print('Configuration Not Found')
+            logger.info("AVD Not Configured")
             return
         hat = '~'
         pipe = '|'
@@ -981,7 +981,7 @@ class AccountInvoice(models.Model):
                 txt += '\n'
         else:
             raise UserError(_('Required data is missing or empty. Please check whether the invoice is validated. Please check the invoice sequence no.'))
-        print(txt)
+        logger.info(txt)
         invoice_counter += 1
         data = '<?xml version="1.0" encoding="utf-8"?>' + \
                '<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">' + \
