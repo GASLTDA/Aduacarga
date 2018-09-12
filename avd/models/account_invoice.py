@@ -3,6 +3,7 @@ import datetime
 import logging
 import string
 
+import base64
 import requests
 import xmltodict
 
@@ -991,7 +992,7 @@ class AccountInvoice(models.Model):
         else:
             raise UserError(_('Required data is missing or empty. Please check whether the invoice is validated. Please check the invoice sequence no.'))
 
-        id.txt_file = str(txt)
+        id.txt_file = base64.b64encode(str(txt).encode())
         invoice_counter += 1
         data = '<?xml version="1.0" encoding="utf-8"?>' + \
                '<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">' + \
