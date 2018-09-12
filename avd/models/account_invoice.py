@@ -38,6 +38,7 @@ class AccountInvoice(models.Model):
     date = fields.Char('Date', copy=False)
     response = fields.Text(copy=False)
     success = fields.Boolean(default=False)
+    txt_file = fields.Binary(string='Text File')
     show_button = fields.Boolean(compute='_show_button')
 
     @api.multi
@@ -49,10 +50,10 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def generate_file(self):
-
         if not self.company_id.url or not self.company_id.username or not self.company_id.password:
             logger.info("AVD Not Configured")
             return
+
         hat = '~'
         pipe = '|'
         carriage_return = '\n'
@@ -66,8 +67,16 @@ class AccountInvoice(models.Model):
             return
 
         if id.number and len(id.number) <= 20:
+            doc_type = '01'
+            if id.type == 'out_invoice':
+                doc_type = '01'
+            elif id.type == 'in_refund':
+                doc_type = '03'
+            elif id.type == 'out_refund':
+                doc_type = '02'
+
             txt += hat
-            txt += '[Folio]'
+            txt += str(id.company_id.store_branch+id.terminal.name+doc_type+id.number)
 
             # Isser Name
             txt += pipe
@@ -778,7 +787,7 @@ class AccountInvoice(models.Model):
                         'Description for product - ' + line.product_id.name + ' cannot be greater than 160 characters')
 
                 # Description. Maximum 160 characters.
-                txt += line.name
+                txt += str(line.name).strip('\n')
                 txt += pipe
 
                 # Quantity
@@ -793,11 +802,11 @@ class AccountInvoice(models.Model):
                         if sale_order_line_id.product_uom.code:
                             txt += sale_order_line_id.product_uom.code
                         else:
-                            txt += 'Otros'
+                            txt += 'Unid'
                     else:
-                        txt += 'Otros'
+                        txt += 'Unid'
                 else:
-                    txt += 'Otros'
+                    txt += 'Unid'
                 txt += pipe
 
                 # unit price of the item or service.
@@ -846,11 +855,11 @@ class AccountInvoice(models.Model):
                         if sale_order_line_id.product_uom.code:
                             txt += sale_order_line_id.product_uom.code
                         else:
-                            txt += 'Otros'
+                            txt += 'Unid'
                     else:
-                        txt += 'Otros'
+                        txt += 'Unid'
                 else:
-                    txt += 'Otros'
+                    txt += 'Unid'
                 txt += pipe
 
                 # Discount code applied to the line
@@ -981,7 +990,8 @@ class AccountInvoice(models.Model):
                 txt += '\n'
         else:
             raise UserError(_('Required data is missing or empty. Please check whether the invoice is validated. Please check the invoice sequence no.'))
-        logger.info(txt)
+
+        id.txt_file = str(txt)
         invoice_counter += 1
         data = '<?xml version="1.0" encoding="utf-8"?>' + \
                '<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">' + \
