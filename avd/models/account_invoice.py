@@ -42,6 +42,8 @@ class AccountInvoice(models.Model):
     txt_file = fields.Binary(string='Text File')
     show_button = fields.Boolean(compute='_show_button')
 
+    payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms', readonly=False)
+
     @api.multi
     def action_invoice_open(self):
         res = super(AccountInvoice, self).action_invoice_open()
