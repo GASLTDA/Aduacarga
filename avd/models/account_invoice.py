@@ -51,10 +51,10 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def generate_file(self):
+
         if not self.company_id.url or not self.company_id.username or not self.company_id.password:
             logger.info("AVD Not Configured")
             return
-
         hat = '~'
         pipe = '|'
         carriage_return = '\n'
@@ -72,9 +72,9 @@ class AccountInvoice(models.Model):
             if id.type == 'out_invoice':
                 doc_type = '01'
             elif id.type == 'in_refund':
-                doc_type = '03'
-            elif id.type == 'out_refund':
                 doc_type = '02'
+            elif id.type == 'out_refund':
+                doc_type = '03'
 
             txt += hat
             txt += str(id.company_id.store_branch+id.terminal.name+doc_type+id.number)
@@ -653,9 +653,9 @@ class AccountInvoice(models.Model):
                 # txt += '01'
                 txt += ''
             elif id.type == 'in_refund':
-                txt += '03'
-            elif id.type == 'out_refund':
                 txt += '02'
+            elif id.type == 'out_refund':
+                txt += '03'
 
             # Telephone number of foreign receiver (20 digits no dashes or spaces).
             txt += pipe
