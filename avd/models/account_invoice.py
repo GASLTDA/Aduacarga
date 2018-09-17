@@ -683,12 +683,14 @@ class AccountInvoice(models.Model):
             # City where the customs.
             txt += pipe
 
-            # Email the issuer.
+            # Email the Receptor.
             txt += pipe
-            txt += self._get_string(self._get_doc_type(id).email)
+            txt += self._get_string(id.partner_id.email)
 
             # Exchange rate
             txt += pipe
+            if id.company_id.currency_id.id !=  id.currency_id.id:
+                txt += str(id.currency_id.rate)
 
             # Type emitter identification. See codes in Annex 3.
             txt += pipe
