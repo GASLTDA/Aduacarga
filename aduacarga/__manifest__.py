@@ -5,7 +5,7 @@
     'sequence': 30,
     'description': """Aduacarga Additional Fields""",
     'category': 'Accounting',
-    'depends' : ['account'],
+    'depends' : ['account','professional_templates'],
     'installable': True,
     'website': 'https://janeindiran.com',
     'application': False,
