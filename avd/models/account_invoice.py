@@ -247,7 +247,7 @@ class AccountInvoice(models.Model):
 
             # Receiver Id/Ref
             txt += pipe
-            txt += self._get_string(self._get_doc_type(id, True).ref)
+            txt += self._get_string(self._get_doc_type(id, True).vat)
 
             # Receiver Street or avenue
             txt += pipe
