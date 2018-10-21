@@ -321,6 +321,8 @@ class AccountInvoice(models.Model):
 
             # Notes
             txt += pipe
+            if id.comment:
+                txt += id.comment
 
             # Notes 2
             txt += pipe
