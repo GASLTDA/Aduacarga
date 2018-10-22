@@ -550,7 +550,7 @@ class AccountInvoice(models.Model):
             for taxes in id.tax_line_ids:
                 tax_id = self.env['account.tax'].search([('name', '=', taxes.name)])
                 if tax_id:
-                    if tax_id.service_tax == False:
+                    if tax_id.service_tax == False and tax_id.amount > 0.0:
                         sales_tax_amount += taxes.amount_total
 
             txt += str(sales_tax_amount)
@@ -589,7 +589,9 @@ class AccountInvoice(models.Model):
             txt += pipe
             for line in id.invoice_line_ids:
                 if line.product_id.type == 'service':
-                    total_service += line.price_total - line.price_subtotal
+                    diff = line.price_total - line.price_subtotal
+                    if diff > 0.0:
+                        total_service += line.price_subtotal
             txt += str(total_service)
 
             # Amount exempt from electronic document for service lines. Place a "0.00" (zero) if not applicable.
@@ -600,7 +602,7 @@ class AccountInvoice(models.Model):
                 if line.product_id.type == 'service':
                     diff = line.price_total - line.price_subtotal
                     if diff == 0.0:
-                        service_exempt += line.price_total
+                        service_exempt += line.price_subtotal
             txt += str(service_exempt)
 
             # Taxed electronic document for lines of goods amount. Place a "0.00" (zero) if not applicable.
@@ -608,12 +610,20 @@ class AccountInvoice(models.Model):
             txt += pipe
             for line in id.invoice_line_ids:
                 if line.product_id.type != 'service':
-                    total_goods += line.price_total - line.price_subtotal
+                    diff = line.price_total - line.price_subtotal
+                    if diff > 0 :
+                        total_goods += line.price_subtotal
             txt += str(total_goods)
 
             # TotalMercanciasExentas {}Amount exempt from electronic document for freight lines. Place a "0.00" (zero) if not applicable.
             txt += pipe
-            txt += str(0.0)
+            total_goods_exempt = 0.0
+            for line in id.invoice_line_ids:
+                if line.product_id.type != 'service':
+                    diff = line.price_total - line.price_subtotal
+                    if diff == 0.0:
+                        total_goods_exempt += line.price_subtotal
+            txt += str(total_goods_exempt)
 
             # Date and time in which the DGT recorded the taxpayer and FE issuer under the "Registration Certificate Electronic Billing". (YyyymmddHHMMSS). Example: 20090109162000.
             txt += pipe
@@ -740,7 +750,7 @@ class AccountInvoice(models.Model):
             subtotal = 0.0
             for line in id.invoice_line_ids:
                 subtotal += line.price_subtotal
-            txt += str(subtotal)
+            txt += str(subtotal-dis_total)
 
             # Year of approval.
             txt += pipe
@@ -763,7 +773,8 @@ class AccountInvoice(models.Model):
             total_service_merchandise = 0.0
             txt += pipe
             for line in id.invoice_line_ids:
-                total_service_merchandise += line.price_total - line.price_subtotal
+                if line.price_total - line.price_subtotal > 0.0:
+                    total_service_merchandise += line.price_subtotal
             txt += str(total_service_merchandise)
 
             # Amount exempt from electronic document for service lines and merchandise. Place a "0.00" (zero) if not applicable.
