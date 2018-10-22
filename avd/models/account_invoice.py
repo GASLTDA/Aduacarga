@@ -1009,6 +1009,8 @@ class AccountInvoice(models.Model):
         else:
             raise UserError(_('Required data is missing or empty. Please check whether the invoice is validated. Please check the invoice sequence no.'))
 
+
+
         id.txt_file = base64.b64encode(str(txt).encode())
         invoice_counter += 1
         data = '<?xml version="1.0" encoding="utf-8"?>' + \
