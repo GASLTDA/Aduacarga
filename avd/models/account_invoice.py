@@ -292,7 +292,7 @@ class AccountInvoice(models.Model):
             txt += pipe
             untaxed_amount = 0.0
             for line in id.invoice_line_ids:
-                untaxed_amount = line.quantity * line.price_unit
+                untaxed_amount += line.quantity * line.price_unit
             txt += str(untaxed_amount)
 
             # Total Tax Amount
@@ -890,7 +890,10 @@ class AccountInvoice(models.Model):
                 # Discount amount. Place a "0.00" (zero) if not applicable.
                 line_total_without_dis = 0.0
                 line_total_without_dis = line.quantity * line.price_unit
-                txt += str(line_total_without_dis * (line.discount / 100))
+                if line.discount > 0.0:
+                    txt += str(line_total_without_dis * (line.discount / 100))
+                else:
+                    txt += str(0.0)
                 txt += pipe
 
                 # Unit price without the discount applied.
@@ -979,37 +982,36 @@ class AccountInvoice(models.Model):
 
                 if line.invoice_line_tax_ids:
                     for tax_ids in line.invoice_line_tax_ids:
-                        txt += '\\'
-                        txt += 'I'
-                        txt += pipe
+                        if tax_ids.amount > 0:
+                            txt += '\\'
+                            txt += 'I'
+                            txt += pipe
 
-                        if tax_ids.service_tax == True:
-                            txt += '01'
-                        else:
-                            txt += '07'
-                        txt += pipe
+                            if tax_ids.service_tax == True:
+                                txt += '01'
+                            else:
+                                txt += '07'
+                            txt += pipe
 
-                        txt += str(tax_ids.amount)
-                        txt += pipe
+                            txt += str(tax_ids.amount)
+                            txt += pipe
 
-                        line_total_without_dis = 0.0
-                        line_total_without_dis = line.quantity * line.price_unit
-                        line_total_after_discount = line_total_without_dis - (
-                            line_total_without_dis * (line.discount / 100))
-                        txt += str(line_total_after_discount * (tax_ids.amount / 100))
-                        txt += pipe
+                            line_total_without_dis = 0.0
+                            line_total_without_dis = line.quantity * line.price_unit
+                            line_total_after_discount = line_total_without_dis - (
+                                line_total_without_dis * (line.discount / 100))
+                            txt += str(line_total_after_discount * (tax_ids.amount / 100))
+                            txt += pipe
 
-                        txt += pipe
-                        txt += pipe
-                        txt += pipe
-                        txt += pipe
+                            txt += pipe
+                            txt += pipe
+                            txt += pipe
+                            txt += pipe
 
             if invoice_counter < (invoice_total - 1):
                 txt += '\n'
         else:
             raise UserError(_('Required data is missing or empty. Please check whether the invoice is validated. Please check the invoice sequence no.'))
-
-
 
         id.txt_file = base64.b64encode(str(txt).encode())
         invoice_counter += 1
